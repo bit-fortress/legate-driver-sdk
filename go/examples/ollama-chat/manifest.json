@@ -1,0 +1,32 @@
+{
+  "id": "ollama-chat",
+  "displayName": "Ollama Chat",
+  "version": "2",
+  "kind": "text",
+  "text": {
+    "protocolContracts": ["openai.chat_completions/2026-07-18"]
+  },
+  "managementCapabilities": [],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "authentication": {
+        "type": "string",
+        "enum": ["none", "bearer"],
+        "default": "none",
+        "description": "Use none for local Ollama or bearer for the ollama.com API."
+      }
+    }
+  },
+  "credentialSchema": {
+    "slots": [
+      {
+        "name": "api_key",
+        "required": false
+      }
+    ]
+  },
+  "requestedCapabilities": [],
+  "wireAbiVersion": "1"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "rust-openai-image-compatible",
+  "displayName": "Rust OpenAI Image-compatible Driver",
+  "version": "1",
+  "kind": "image",
+  "image": {
+    "protocolContracts": [
+      "openai.images.generations/2026-07-19",
+      "openai.images.edits/2026-07-19"
+    ]
+  },
+  "managementCapabilities": [],
+  "configSchema": {"type": "object", "additionalProperties": false},
+  "credentialSchema": {"slots": [{"name": "api_key", "required": true}]},
+  "requestedCapabilities": [],
+  "wireAbiVersion": "1"
+}

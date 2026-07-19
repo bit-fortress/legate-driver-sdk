@@ -1,0 +1,13 @@
+.DS_Store
+.idea/
+.vscode/
+go/bin/
+go/examples/*/driver.wasm
+rust/target/
+rust/examples/*/driver.wasm
+
+# Internal agent state
+AGENTS.md
+.agents/
+.gstack/
+.superpowers/

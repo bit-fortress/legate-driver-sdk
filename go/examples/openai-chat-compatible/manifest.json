@@ -1,0 +1,14 @@
+{
+  "id": "go-openai-chat-compatible",
+  "displayName": "Go OpenAI Chat-compatible Text Driver",
+  "version": "1",
+  "kind": "text",
+  "text": {
+    "protocolContracts": ["openai.chat_completions/2026-07-18"]
+  },
+  "managementCapabilities": [],
+  "configSchema": {"type": "object", "additionalProperties": false},
+  "credentialSchema": {"slots": [{"name": "api_key", "required": true}]},
+  "requestedCapabilities": [],
+  "wireAbiVersion": "1"
+}

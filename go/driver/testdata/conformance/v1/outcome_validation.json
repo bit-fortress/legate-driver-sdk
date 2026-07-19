@@ -1,0 +1,10 @@
+{
+  "cases": [
+    {"name":"success","class":"success","vendor_code":"","valid":true},
+    {"name":"caller","class":"caller_error","vendor_code":"invalid_input","valid":true},
+    {"name":"endpoint","class":"endpoint_error","vendor_code":"overloaded","valid":true},
+    {"name":"mapping","class":"mapping_error","vendor_code":"model_not_found","valid":true},
+    {"name":"success_vendor_code","class":"success","vendor_code":"unexpected","valid":false},
+    {"name":"unknown","class":"retryable","vendor_code":"","valid":false}
+  ]
+}

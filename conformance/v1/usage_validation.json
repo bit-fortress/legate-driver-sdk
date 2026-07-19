@@ -1,0 +1,168 @@
+{
+  "raw_negative_partial_hex": "080210ffffffffffffffffff013001",
+  "cases": [
+    {
+      "name": "final zero aggregates",
+      "valid": true,
+      "status": "final",
+      "provenance": "upstream_reported",
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "name": "final details within aggregates",
+      "valid": true,
+      "status": "final",
+      "provenance": "driver_accumulated",
+      "input_tokens": 12,
+      "output_tokens": 5,
+      "cached_tokens": 4,
+      "reasoning_tokens": 3
+    },
+    {
+      "name": "final max int64 total",
+      "valid": true,
+      "status": "final",
+      "provenance": "upstream_reported",
+      "input_tokens": 9223372036854775807,
+      "output_tokens": 0
+    },
+    {
+      "name": "partial input only",
+      "valid": true,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "input_tokens": 1
+    },
+    {
+      "name": "partial output only",
+      "valid": true,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "output_tokens": 1
+    },
+    {
+      "name": "partial cached without parent",
+      "valid": true,
+      "status": "partial",
+      "provenance": "driver_accumulated",
+      "cached_tokens": 1
+    },
+    {
+      "name": "partial reasoning without parent",
+      "valid": true,
+      "status": "partial",
+      "provenance": "driver_accumulated",
+      "reasoning_tokens": 1
+    },
+    {
+      "name": "unavailable",
+      "valid": true,
+      "status": "unavailable",
+      "provenance": "upstream_reported"
+    },
+    {
+      "name": "unspecified status",
+      "valid": false,
+      "status": "unspecified",
+      "provenance": "upstream_reported",
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "name": "unspecified provenance",
+      "valid": false,
+      "status": "final",
+      "provenance": "unspecified",
+      "input_tokens": 0,
+      "output_tokens": 0
+    },
+    {
+      "name": "final missing input",
+      "valid": false,
+      "status": "final",
+      "provenance": "upstream_reported",
+      "output_tokens": 1
+    },
+    {
+      "name": "final missing output",
+      "valid": false,
+      "status": "final",
+      "provenance": "upstream_reported",
+      "input_tokens": 1
+    },
+    {
+      "name": "partial empty",
+      "valid": false,
+      "status": "partial",
+      "provenance": "upstream_reported"
+    },
+    {
+      "name": "unavailable known zero",
+      "valid": false,
+      "status": "unavailable",
+      "provenance": "upstream_reported",
+      "input_tokens": 0
+    },
+    {
+      "name": "negative input",
+      "valid": false,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "input_tokens": -1
+    },
+    {
+      "name": "negative output",
+      "valid": false,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "output_tokens": -1
+    },
+    {
+      "name": "negative cached",
+      "valid": false,
+      "status": "partial",
+      "provenance": "driver_accumulated",
+      "cached_tokens": -1
+    },
+    {
+      "name": "negative reasoning",
+      "valid": false,
+      "status": "partial",
+      "provenance": "driver_accumulated",
+      "reasoning_tokens": -1
+    },
+    {
+      "name": "cached exceeds input",
+      "valid": false,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "input_tokens": 1,
+      "cached_tokens": 2
+    },
+    {
+      "name": "reasoning exceeds output",
+      "valid": false,
+      "status": "partial",
+      "provenance": "upstream_reported",
+      "output_tokens": 1,
+      "reasoning_tokens": 2
+    },
+    {
+      "name": "final total overflow",
+      "valid": false,
+      "status": "final",
+      "provenance": "upstream_reported",
+      "input_tokens": 9223372036854775807,
+      "output_tokens": 1
+    },
+    {
+      "name": "partial total overflow",
+      "valid": false,
+      "status": "partial",
+      "provenance": "driver_accumulated",
+      "input_tokens": 9223372036854775807,
+      "output_tokens": 1
+    }
+  ]
+}

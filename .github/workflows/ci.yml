@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+      - uses: dtolnay/rust-toolchain@1.97.0
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: acifani/setup-tinygo@v2
+        with:
+          tinygo-version: '0.39.0'
+      - name: Install WABT 1.0.41
+        env:
+          WABT_SHA256: 83f8122e924745fcd70636e3594bc01c4c47f2d4c8f3c63b5d70d3f83a482677
+        run: |
+          curl -fsSLo /tmp/wabt.tar.gz \
+            https://github.com/WebAssembly/wabt/releases/download/1.0.41/wabt-1.0.41-linux-x64.tar.gz
+          echo "${WABT_SHA256}  /tmp/wabt.tar.gz" | sha256sum -c -
+          mkdir /tmp/wabt
+          tar -xzf /tmp/wabt.tar.gz -C /tmp/wabt --strip-components=1
+          echo "/tmp/wabt/bin" >> "${GITHUB_PATH}"
+      - name: Test and verify
+        run: make test verify

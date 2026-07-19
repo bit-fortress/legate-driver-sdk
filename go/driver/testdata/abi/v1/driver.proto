@@ -1,0 +1,421 @@
+syntax = "proto3";
+
+package legate.driver.abi.v1;
+
+option go_package = "github.com/bootun/legate/api/driver/abi/v1;abiv1";
+
+enum TextMode {
+  TEXT_MODE_UNSPECIFIED = 0;
+  TEXT_MODE_BUFFERED = 1;
+  TEXT_MODE_SSE = 2;
+}
+
+enum AuthKind {
+  AUTH_KIND_UNSPECIFIED = 0;
+  AUTH_KIND_NONE = 1;
+  AUTH_KIND_BEARER = 2;
+  AUTH_KIND_API_KEY_HEADER = 3;
+}
+
+enum SemanticOutcomeClass {
+  SEMANTIC_OUTCOME_CLASS_UNSPECIFIED = 0;
+  SEMANTIC_OUTCOME_CLASS_SUCCESS = 1;
+  SEMANTIC_OUTCOME_CLASS_CALLER_ERROR = 2;
+  SEMANTIC_OUTCOME_CLASS_ENDPOINT_ERROR = 3;
+  SEMANTIC_OUTCOME_CLASS_MAPPING_ERROR = 4;
+}
+
+enum UsageStatus {
+  USAGE_STATUS_UNSPECIFIED = 0;
+  USAGE_STATUS_FINAL = 1;
+  USAGE_STATUS_PARTIAL = 2;
+  USAGE_STATUS_UNAVAILABLE = 3;
+}
+
+enum UsageProvenance {
+  USAGE_PROVENANCE_UNSPECIFIED = 0;
+  USAGE_PROVENANCE_UPSTREAM_REPORTED = 1;
+  USAGE_PROVENANCE_DRIVER_ACCUMULATED = 2;
+}
+
+message FieldIssue {
+  string pointer = 1;
+  string code = 2;
+  string message = 3;
+}
+
+message DriverError {
+  string code = 1;
+  string message = 2;
+  repeated FieldIssue issues = 3;
+  UsageReport usage = 4;
+}
+
+message NameValues {
+  string name = 1;
+  repeated string values = 2;
+}
+
+message MessageBody {
+  string media_type = 1;
+  bytes payload = 2;
+}
+
+message ProtocolPayload {
+  string protocol_contract = 1;
+  string media_type = 2;
+  bytes json = 3;
+}
+
+message ProtocolEventPayload {
+  string protocol_contract = 1;
+  string event_type = 2;
+  bytes json = 3;
+}
+
+message CredentialSlotDescriptor {
+  string name = 1;
+  bool configured = 2;
+}
+
+message TextCapabilities {
+  repeated string protocol_contracts = 1;
+}
+
+message ImageCapabilities {
+  repeated string protocol_contracts = 1;
+}
+
+message BindRequest {
+  bytes config_json = 1;
+  repeated string endpoint_refs = 2;
+  repeated CredentialSlotDescriptor credential_slots = 3;
+}
+
+message BindSuccess {
+  bytes bound_state = 1;
+  oneof capabilities {
+    TextCapabilities text_capabilities = 2;
+    ImageCapabilities image_capabilities = 3;
+  }
+}
+
+message BindResponse {
+  oneof result {
+    BindSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message AuthPlan {
+  AuthKind kind = 1;
+  string credential_slot = 2;
+  string header_name = 3;
+}
+
+message RequestPlan {
+  string endpoint_ref = 1;
+  string method = 2;
+  string relative_path = 3;
+  repeated NameValues query = 4;
+  repeated NameValues headers = 5;
+  MessageBody body = 6;
+  AuthPlan auth = 7;
+  BodyPlan body_plan = 8;
+}
+
+message UsageReport {
+  UsageStatus status = 1;
+  optional int64 input_tokens = 2;
+  optional int64 output_tokens = 3;
+  optional int64 cached_tokens = 4;
+  optional int64 reasoning_tokens = 5;
+  UsageProvenance provenance = 6;
+}
+
+message SemanticOutcome {
+  SemanticOutcomeClass class = 1;
+  string vendor_code = 2;
+}
+
+message ClientResponse {
+  int32 status_code = 1;
+  repeated NameValues headers = 2;
+  ProtocolPayload body = 3;
+  SemanticOutcome outcome = 4;
+  UsageReport usage = 5;
+}
+
+message TextInvocation {
+  TextMode mode = 1;
+  ProtocolPayload request = 2;
+  ProtocolPayload protocol_metadata = 3;
+  string selected_upstream_model = 4;
+  string response_id = 5;
+}
+
+message TextAttemptOpenRequest {
+  bytes bound_state = 1;
+  TextInvocation invocation = 2;
+}
+
+message TextAttemptOpenSuccess {
+  uint64 attempt_handle = 1;
+  oneof output {
+    RequestPlan request = 2;
+    ClientResponse response = 3;
+  }
+}
+
+message TextAttemptOpenResponse {
+  oneof result {
+    TextAttemptOpenSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message UpstreamResponseHead {
+  int32 status_code = 1;
+  repeated NameValues headers = 2;
+}
+
+message BufferedUpstreamResponse {
+  UpstreamResponseHead head = 1;
+  MessageBody body = 2;
+}
+
+message TextTransformBufferedResponseRequest {
+  uint64 attempt_handle = 1;
+  BufferedUpstreamResponse upstream = 2;
+}
+
+message TextTransformBufferedResponseSuccess {
+  ClientResponse response = 1;
+}
+
+message TextTransformBufferedResponseResponse {
+  oneof result {
+    TextTransformBufferedResponseSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message TextSSEOpenRequest {
+  uint64 attempt_handle = 1;
+  UpstreamResponseHead upstream = 2;
+}
+
+message TextSSEOpenSuccess {
+  int32 status_code = 1;
+  repeated NameValues headers = 2;
+  SemanticOutcome outcome = 3;
+}
+
+message TextSSEOpenResponse {
+  oneof result {
+    TextSSEOpenSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message UpstreamSSEEvent {
+  string event_type = 1;
+  bytes data = 2;
+  optional string last_event_id = 3;
+  optional uint64 retry_milliseconds = 4;
+}
+
+message TextSSETransformEventRequest {
+  uint64 attempt_handle = 1;
+  UpstreamSSEEvent upstream = 2;
+}
+
+message TextSSETransformEventSuccess {
+  repeated ProtocolEventPayload events = 1;
+  SemanticOutcome outcome = 2;
+  UsageReport usage = 3;
+}
+
+message TextSSETransformEventResponse {
+  oneof result {
+    TextSSETransformEventSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message TextSSEFinishRequest {
+  uint64 attempt_handle = 1;
+}
+
+message TextSSEFinishSuccess {
+  repeated ProtocolEventPayload events = 1;
+  SemanticOutcome outcome = 2;
+  UsageReport usage = 3;
+}
+
+message TextSSEFinishResponse {
+  oneof result {
+    TextSSEFinishSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message TextAttemptCloseRequest {
+  uint64 attempt_handle = 1;
+}
+
+message TextAttemptCloseSuccess {}
+
+message TextAttemptCloseResponse {
+  oneof result {
+    TextAttemptCloseSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message BlobRef {
+  uint64 id = 1;
+  int64 size = 2;
+  bytes sha256 = 3;
+}
+
+message MultipartInputPart {
+  string name = 1;
+  optional string filename = 2;
+  repeated NameValues headers = 3;
+  string content_type = 4;
+  oneof content {
+    bytes inline = 5;
+    BlobRef blob = 6;
+  }
+}
+
+message MultipartInput {
+  repeated MultipartInputPart parts = 1;
+}
+
+message ImageProtocolRequest {
+  string protocol_contract = 1;
+  string media_type = 2;
+  oneof body {
+    bytes json = 3;
+    MultipartInput multipart = 4;
+  }
+}
+
+message ImageInvocation {
+  ImageProtocolRequest request = 1;
+  string selected_upstream_model = 2;
+  string response_id = 3;
+  repeated BlobRef blobs = 4;
+}
+
+message BodySegment {
+  oneof source {
+    bytes inline = 1;
+    BlobRef blob = 2;
+    BlobRef base64 = 3;
+  }
+}
+
+message CompositeBody {
+  repeated BodySegment segments = 1;
+}
+
+message MultipartBodyPart {
+  string name = 1;
+  optional string filename = 2;
+  repeated NameValues headers = 3;
+  string content_type = 4;
+  BodySegment content = 5;
+}
+
+message MultipartBody {
+  repeated MultipartBodyPart parts = 1;
+}
+
+message InlineBody {
+  bytes bytes = 1;
+}
+
+message BodyPlan {
+  string media_type = 1;
+  oneof body {
+    InlineBody inline = 2;
+    BlobRef blob = 3;
+    BlobRef base64 = 4;
+    CompositeBody composite = 5;
+    MultipartBody multipart = 6;
+  }
+}
+
+message ImageAttemptOpenRequest {
+  bytes bound_state = 1;
+  ImageInvocation invocation = 2;
+}
+
+message ImageAttemptOpenSuccess {
+  uint64 attempt_handle = 1;
+  oneof output {
+    RequestPlan request = 2;
+    ImageClientResponse response = 3;
+  }
+}
+
+message ImageAttemptOpenResponse {
+  oneof result {
+    ImageAttemptOpenSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message ImageUpstreamBody {
+  string media_type = 1;
+  oneof content {
+    bytes inline = 2;
+    BlobRef blob = 3;
+  }
+}
+
+message ImageUpstreamResponse {
+  UpstreamResponseHead head = 1;
+  ImageUpstreamBody body = 2;
+}
+
+message ImageClientResponse {
+  int32 status_code = 1;
+  repeated NameValues headers = 2;
+  string protocol_contract = 3;
+  BodyPlan body = 4;
+  SemanticOutcome outcome = 5;
+  UsageReport usage = 6;
+}
+
+message ImageTransformBufferedResponseRequest {
+  uint64 attempt_handle = 1;
+  ImageUpstreamResponse upstream = 2;
+}
+
+message ImageTransformBufferedResponseSuccess {
+  ImageClientResponse response = 1;
+}
+
+message ImageTransformBufferedResponseResponse {
+  oneof result {
+    ImageTransformBufferedResponseSuccess success = 1;
+    DriverError error = 2;
+  }
+}
+
+message ImageAttemptCloseRequest {
+  uint64 attempt_handle = 1;
+}
+
+message ImageAttemptCloseSuccess {}
+
+message ImageAttemptCloseResponse {
+  oneof result {
+    ImageAttemptCloseSuccess success = 1;
+    DriverError error = 2;
+  }
+}
